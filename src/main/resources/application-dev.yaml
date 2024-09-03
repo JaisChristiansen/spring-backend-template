@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:8001/test_db
+    username: root
+    password: abcd1234!!QQ
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  h2:
+    console:
+      enabled: true
+
+variables:
+  backend-url: http://localhost:8080/rest/restapi
+  auth-key:
+    username: admin
+    password: yw9+5.Y-'$5ARVj7S'hm2:RM
+
+app:
+  SECRET_KEY: J.A;5fgD'8a&+oe,tzl~VNiR8#TyeF(PQfk[>:T*4Xcpo$tCh6DH$;@hb}?A[1%
+  RUNNING_ENVIRONMENT: development
