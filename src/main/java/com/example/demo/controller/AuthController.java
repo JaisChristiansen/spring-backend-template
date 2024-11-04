@@ -30,6 +30,7 @@ public class AuthController {
 
     @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<UserDto> login(@RequestBody LoginDto loginDto) {
+        System.out.println("Logging in!");
         User user = userService.authenticate(loginDto.getMail(), loginDto.getPassword());
         if (user != null) {
             Long session = jwtService.generateSession();

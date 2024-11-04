@@ -64,7 +64,12 @@ public class JwtService {
         return user.getId().equals(uuid) && user.getSessionToken().equals(session) && !isTokenExpired(token);
     }
 
-    private JsonObject extractId(String token) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public JsonObject extractId(String token) {
         String id = extractClaim(token, Claims::getId);
         return JsonParser.parseString(id).getAsJsonObject();
     }
@@ -75,11 +80,6 @@ public class JwtService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
