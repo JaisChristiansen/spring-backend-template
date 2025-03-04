@@ -36,7 +36,7 @@ public class User extends AbstractEntity {
     @Column(name = "session_token")
     private Long sessionToken;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_role_id", nullable = false)
     private UserRole userRole;
 }

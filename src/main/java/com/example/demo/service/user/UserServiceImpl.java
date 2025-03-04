@@ -1,6 +1,6 @@
 package com.example.demo.service.user;
 
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.UserCreationDto;
 import com.example.demo.dto.UserRoleDto;
 import com.example.demo.enums.UserRoleName;
 import com.example.demo.model.User;
@@ -22,8 +22,6 @@ public class UserServiceImpl implements UserService {
     UserRoleRepository userRoleRepository;
 
     PasswordEncoder passwordEncoder;
-
-
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository, PasswordEncoder passwordEncoder) {
@@ -48,23 +46,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User signUp(UserDto userDto, String password) {
-        if (userDto.getId() != null || userRepository.getUserByMail(userDto.getMail()).isPresent()) {
+    public User signUp(UserCreationDto userCreationDto) {
+        if (userCreationDto.getId() != null || userRepository.getUserByMail(userCreationDto.getMail()).isPresent()) {
             return null;
             // TODO create exceptions
         }
 
         User user = new User();
-        user.setMail(userDto.getMail());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setCallingCode(userDto.getCallingCode());
-        user.setPhone(userDto.getPhone());
-        user.setDescription(userDto.getDescription());
+        user.setMail(userCreationDto.getMail());
+        user.setFirstName(userCreationDto.getFirstName());
+        user.setLastName(userCreationDto.getLastName());
+        user.setCallingCode(userCreationDto.getCallingCode());
+        user.setPhone(userCreationDto.getPhone());
+        user.setDescription(userCreationDto.getDescription());
         user.setActive(false);
         user.setUserRole(
                 userRoleRepository.getUserRoleByName(
-                        Optional.ofNullable(userDto.getUserRole())
+                        Optional.ofNullable(userCreationDto.getUserRole())
                                 .map(UserRoleDto::getName)
                                 .map(UserRoleName::valueOf)
                                 .orElse(null)
@@ -72,9 +70,9 @@ public class UserServiceImpl implements UserService {
         );
         user.setPassword(
                 passwordEncoder.encode(
-                        StringUtil.isNullOrEmpty(password)
+                        StringUtil.isNullOrEmpty(userCreationDto.getPassword())
                                 ? StringUtil.generateAlphanumericString(true)
-                                : password
+                                : userCreationDto.getPassword()
                 )
         );
 

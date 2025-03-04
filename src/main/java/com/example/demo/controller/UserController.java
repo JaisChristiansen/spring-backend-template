@@ -1,12 +1,16 @@
 package com.example.demo.controller;
 
+import com.example.demo.converter.UserConverter;
 import com.example.demo.dto.PasswordRequestDto;
+import com.example.demo.dto.UserCreationDto;
 import com.example.demo.dto.UserDto;
+import com.example.demo.exception.ApiException;
+import com.example.demo.exception.NotFoundException;
+import com.example.demo.exception.UnauthorizedException;
 import com.example.demo.model.User;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.user.UserService;
 import com.example.demo.util.AuthUtil;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +24,21 @@ import java.util.UUID;
 public class UserController {
 
     JwtService jwtService;
-    ModelMapper modelMapper;
+    UserConverter userConverter;
     UserService userService;
 
     @Autowired
-    public UserController(JwtService jwtService, ModelMapper modelMapper, UserService userService) {
+    public UserController(
+            JwtService jwtService,
+            UserConverter userConverter,
+            UserService userService
+    ) {
         this.jwtService = jwtService;
-        this.modelMapper = modelMapper;
+        this.userConverter = userConverter;
         this.userService = userService;
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "/by-session", produces = "application/json")
     public ResponseEntity<UserDto> getUser(
             @RequestHeader("Authorization") String authHeader
     ) {
@@ -64,16 +72,34 @@ public class UserController {
     }
 
     @PostMapping(produces = "application/json")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(
+            @RequestBody UserCreationDto userCreationDto
+    ) {
         return new ResponseEntity<>(
-                convertToDto(userService.signUp(userDto, "abcd1234!!!!")),
+                convertToDto(userService.signUp(userCreationDto)),
                 HttpStatus.CREATED
         );
     }
 
     @PutMapping(produces = "application/json")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
-        return null;
+    public ResponseEntity<UserDto> updateUser(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody UserDto userDto
+    ) {
+        if (userService.getById(UUID.fromString(userDto.getId())).isPresent()) {
+            try {
+                User user = getUserFromAuthHeader(authHeader);
+                if (userHasEditRights(user, UUID.fromString(userDto.getId()))) {
+                    return new ResponseEntity<>(
+                            convertToDto(userService.persist(convertToEntity(userDto))),
+                            HttpStatus.OK
+                    );
+                }
+            } catch (ApiException exception) {
+                return new ResponseEntity<>(exception.getStatus());
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping(value = "/change-password", produces = "application/json")
@@ -81,17 +107,35 @@ public class UserController {
         return null;
     }
 
+    private User getUserFromAuthHeader(String authheader) {
+        UUID userId = Optional.of(authheader)
+                .map(s -> s.replaceAll(AuthUtil.BEARER, ""))
+                .map(jwtService::extractId)
+                .map(jsonObject -> UUID.fromString(jsonObject.get("userId").getAsString()))
+                .orElse(null);
+        return userService.getById(userId)
+                .orElseThrow(() -> new UnauthorizedException("User not found in AUTH header"));
+    }
+
+    private boolean userHasEditRights(User user, UUID userIdToEdit) {
+        return user.getUserRole().getAccessLevel() >= 100 || user.getId().equals(userIdToEdit);
+    }
+
     private UserDto convertToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        return userDto;
+        return userConverter.mapUserToDto(user);
     }
 
     private User convertToEntity(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
+        User user;
         if (userDto.getId() != null) {
-            user.setId(UUID.fromString(userDto.getId()));
+            user = userService.getById(UUID.fromString(userDto.getId()))
+                    .orElseThrow(() -> new NotFoundException("User not found from ID"));
+        } else {
+            throw new NotFoundException("No ID");
+            // TODO not possible
         }
-        // TODO userRole
-        return user;
+        // TODO look more into the ModelMapper, for custom mapping
+        // TODO userRole and non-nullable fields
+        return userConverter.mapDtoToUser(userDto, user);
     }
 }

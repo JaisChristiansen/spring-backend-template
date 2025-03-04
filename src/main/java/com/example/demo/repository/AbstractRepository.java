@@ -3,6 +3,7 @@ package com.example.demo.repository;
 import com.example.demo.util.CollectionUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -13,13 +14,18 @@ import java.util.List;
 
 public abstract class AbstractRepository<T> {
 
-    private final Class<T> entityClass;
+    @PersistenceContext
+    private EntityManager em;
 
-    public AbstractRepository(Class<T> entityClass) {
-        this.entityClass = entityClass;
+//    private final Class<T> entityClass;
+
+//    public AbstractRepository(Class<T> entityClass) {
+//        this.entityClass = entityClass;
+//    }
+
+    protected EntityManager getEntityManager() {
+        return em;
     }
-
-    protected abstract EntityManager getEntityManager();
 
     protected T getSingleResult(CriteriaQuery<T> cq) {
         TypedQuery<T> q = getEntityManager().createQuery(cq);

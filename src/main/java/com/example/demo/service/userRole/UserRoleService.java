@@ -12,5 +12,6 @@ public interface UserRoleService extends AbstractService<UserRole, UUID> {
 
     Optional<UserRole> getByName(UserRoleName name);
 
+
     List<UserRole> findAll();
 }

@@ -37,6 +37,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public Optional<UserRole> getByName(UserRoleName name) {
+        System.out.println("Getting by name");
         return userRoleRepository.getUserRoleByName(name);
     }
 

@@ -19,8 +19,8 @@ public class UserRole extends AbstractEntity {
     @Column(name = "access_level", nullable = false)
     private Integer accessLevel;
 
-    @OneToMany(mappedBy = "userRole")
-    Set<User> users;
+    @OneToMany(mappedBy = "userRole", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<User> users;
 
     public UserRole() {
         super();

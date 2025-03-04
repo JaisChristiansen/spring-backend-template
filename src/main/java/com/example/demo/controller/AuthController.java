@@ -1,11 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.converter.UserConverter;
 import com.example.demo.dto.LoginDto;
+import com.example.demo.dto.UserCreationDto;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.user.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
     JwtService jwtService;
-    ModelMapper modelMapper;
+    UserConverter userConverter;
     UserService userService;
 
     @Autowired
-    public AuthController(JwtService jwtService, ModelMapper modelMapper, UserService userService) {
+    public AuthController(JwtService jwtService, UserConverter userConverter, UserService userService) {
         this.jwtService = jwtService;
-        this.modelMapper = modelMapper;
+        this.userConverter = userConverter;
         this.userService = userService;
     }
 
@@ -43,16 +44,15 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<UserDto> signUp(@RequestBody UserDto userDto) {
-        System.out.println(userDto.getMail());
+    @PostMapping(value = "/sign-up", produces = "application/json")
+    public ResponseEntity<UserDto> signUp(@RequestBody UserCreationDto userCreationDto) {
         return new ResponseEntity<>(
-                convertToDto(userService.signUp(userDto, "abcd1234!!!!")),
+                convertToDto(userService.signUp(userCreationDto)),
                 HttpStatus.CREATED
         );
     }
 
     private UserDto convertToDto(User user) {
-        return modelMapper.map(user, UserDto.class);
+        return userConverter.mapUserToDto(user);
     }
 }
