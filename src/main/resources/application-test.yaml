@@ -7,11 +7,11 @@ spring:
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:8001/dnd_project
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:8001/dnd-project
     username: root
     password: abcd1234!!QQ
     driver-class-name: com.mysql.cj.jdbc.Driver

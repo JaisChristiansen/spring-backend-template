@@ -12,12 +12,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DiceRoll extends AbstractEntity {
-    @Column(name = "no_of_dice", nullable = false, columnDefinition = "default 1")
+    @Column(name = "no_of_dice", nullable = false, columnDefinition = "int default 1")
     private Integer noOfDice;
     @Column(name = "die_type", nullable = false)
     private Integer dieType;
     @Column(name = "higher_level_dice")
     private Integer higherLevelDice;
+
     @OneToOne(mappedBy = "diceRoll")
     private Spell spell;
 }

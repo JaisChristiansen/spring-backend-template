@@ -15,6 +15,7 @@ public class SpellLevel extends AbstractEntity {
     private String name;
     @Column(name = "level", nullable = false)
     private Integer level;
+
     @OneToMany(mappedBy = "spellLevel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Spell> spells;
 }

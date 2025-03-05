@@ -19,6 +19,7 @@ public class SpellSchool extends AbstractEntity {
     private String color;
     @Column(name = "text_color")
     private String textColor;
+
     @OneToMany(mappedBy = "spellSchool", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Spell> spells;
 }

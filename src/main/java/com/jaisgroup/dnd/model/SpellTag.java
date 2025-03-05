@@ -9,18 +9,14 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Set;
 
-@Entity(name = "condition_effect")
-@Table(name = "condition_effect")
+@Entity(name = "spell_tag")
+@Table(name = "spell_tag")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Condition extends AbstractEntity {
+public class SpellTag extends AbstractEntity {
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "description")
-    private String description;
-    @Column(name = "svg")
-    private String svg;
 
-    @ManyToMany(mappedBy = "conditions")
+    @ManyToMany(mappedBy = "spellTags")
     private Set<Spell> spells;
 }

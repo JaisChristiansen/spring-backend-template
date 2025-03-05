@@ -14,15 +14,15 @@ public class Spell extends AbstractEntity {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "description", nullable = false)
-    private String text;
+    private String description;
     @Column(name = "higher_levels")
     private String higherLevels;
     @Column(name = "concentration", nullable = false, columnDefinition = "tinyint(1) default 0")
     private Boolean concentration;
     @Column(name = "ritual", nullable = false, columnDefinition = "tinyint(1) default 0")
     private Boolean ritual;
-    @Column(name = "range")
-    private Integer range;
+    @Column(name = "spell_range")
+    private String spellRange;
     @Column(name = "area")
     private Integer area;
     @Column(name = "casting_time")
@@ -43,31 +43,49 @@ public class Spell extends AbstractEntity {
     @ManyToOne()
     @JoinColumn(name = "spell_level_id", nullable = false)
     private SpellLevel spellLevel;
+
     @ManyToOne()
     @JoinColumn(name = "spell_school_id", nullable = false)
     private SpellSchool spellSchool;
+
     @OneToOne(optional = false)
     @JoinColumn(name = "dice_roll_id", nullable = false)
     private DiceRoll diceRoll;
+
     @ManyToMany(mappedBy = "spells")
     Set<CharacterClass> characterClasses;
+
     @ManyToMany(mappedBy = "spells")
     Set<Rulebook> rulebooks;
+
     @ManyToMany()
     @JoinTable(
-            name = "spell_condition",
-            joinColumns = @JoinColumn(name = "spell_id"),
-            inverseJoinColumns = @JoinColumn(name = "condition_id")
+            name = "spell_condition"
     )
     private Set<Condition> conditions;
+
     @ManyToMany()
     @JoinTable(
-            name = "spell_damage_type",
-            joinColumns = @JoinColumn(name = "spell_id"),
-            inverseJoinColumns = @JoinColumn(name = "damage_type_id")
+            name = "spell_damage_type"
     )
     private Set<DamageType> damageTypes;
-    // TODO Save(s) required (Ability)
-    // TODO Area Type
-    // TODO Spell Tags
+
+    @ManyToMany()
+    @JoinTable(
+            name = "spell_ability"
+    )
+    private Set<Ability> saveAbilities;
+
+    @ManyToOne()
+    @JoinColumn(name = "area_of_effect_id")
+    private AreaOfEffect areaOfEffect;
+
+    @ManyToMany()
+    @JoinTable(
+            name = "spell_spell_tag"
+    )
+    private Set<SpellTag> spellTags;
+
+    @ManyToMany(mappedBy = "spells")
+    private Set<Character> characters;
 }

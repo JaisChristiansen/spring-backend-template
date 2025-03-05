@@ -15,6 +15,7 @@ public class CharacterClass extends AbstractEntity {
     private String name;
     @Column(name = "description")
     private String description;
+
     @ManyToMany()
     @JoinTable(
             name = "character_class_spell",
@@ -22,5 +23,7 @@ public class CharacterClass extends AbstractEntity {
             inverseJoinColumns = @JoinColumn(name = "spell_id")
     )
     Set<Spell> spells;
+    @OneToMany(mappedBy = "characterClass")
+    private Set<Character> characters;
     // TODO add more
 }
