@@ -11,7 +11,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:8001/test_db
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:8001/dnd_project
     username: root
     password: abcd1234!!QQ
     driver-class-name: com.mysql.cj.jdbc.Driver
